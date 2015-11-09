@@ -99,6 +99,7 @@ class LoginViewController: UIViewController {
                 let alertView = UIAlertController(title: "Error", message: "Login failed", preferredStyle: .Alert)
                 
                 alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                
                 switch result{
                 case .Success(let data):
                     let json = JSON(data)

@@ -514,13 +514,50 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     // MARK: - Navigation
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
-       
-        
+    override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject?) -> Bool {
+        if identifier == "segueToBatch" {
+            if self.lblInOut.text! == "In/Out"{
+                let alert = UIAlertController(title: "Error", message: "Please choose In or Out", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+                
+                return false
+            }/* else if self.unitLabel.text == "Unit"{
+                let alert = UIAlertController(title: "Error", message: "Please select a Unit", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+                return false
+                
+            } else if self.activityLabel.text == "Activity" {
+                let alert = UIAlertController(title: "Error", message: "Please select an Activity", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+                
+                return false
+            }*/ else {
+                return true
+            }
+            
+            
+        }
+        return true
     }
     
-
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        if segue.identifier == "segueToBatch" {
+            if self.lblInOut.text! == "In" {
+                if let destinationVC = segue.destinationViewController as? BatchViewController{
+                    destinationVC.attendMethod = self.lblInOut.text!
+                }
+            }
+            if self.lblInOut.text! == "Out" {
+                if let destinationVC = segue.destinationViewController as? BatchViewController{
+                    destinationVC.attendMethod = self.lblInOut.text!
+                }
+            }
+        }
+    }
 }
 
     
