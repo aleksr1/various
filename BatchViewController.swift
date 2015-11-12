@@ -17,26 +17,19 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
     var unfilteredMembers = [Dictionary<String,String>]()
     var filteredMembers = [Dictionary<String,String>]()
     var punchMembers = [Dictionary<String,String>]()
-    var scanInPunch = [Dictionary <String,String>]()
-    var scanOutPunch = [Dictionary<String,String>]()
     var searchController: UISearchController!
     var acceptBarButtonItem: UIBarButtonItem!
     var attendMethod = ""
-    var duplicates    = NSMutableArray()
-    var noDuplicates  = NSMutableArray()
     
      override func viewDidLoad() {
         super.viewDidLoad()
         acceptBarButtonItem = UIBarButtonItem(title: "Accept", style: .Plain, target: self, action: "performCancel")
         navigationItem.rightBarButtonItem = acceptBarButtonItem
         performRefresh()
-        //self.tableView.rowHeight = UITableViewAutomaticDimension
-        //self.tableView.estimatedRowHeight = 44.0
         configureSearchController()
         print(attendMethod)
         
     }
-   
     
     //10-21-15 SearchBar code updates
     func configureSearchController(){
@@ -223,166 +216,89 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
         self.tableView.deselectRowAtIndexPath(indexPath, animated: false)
         let myCell = tableView.cellForRowAtIndexPath(indexPath) as! BatchTableViewCell
         let row = indexPath.row
-        print("------------------------------------------------------------------------------ NEW PRESS --------------------------------------------------")
         if self.attendMethod == "In" {
-            if self.scanInPunch.count == 0 {
+            if self.punchMembers.count == 0 {
                 if self.filteredMembers.count > 0{
-                    self.scanInPunch = self.filteredMembers.filter({
+                    self.punchMembers = self.filteredMembers.filter({
                         $0["MemberID"] == myCell.lblMemberID.text
                     })
                 } else {
-                    self.scanInPunch = self.unfilteredMembers.filter({
+                    self.punchMembers = self.unfilteredMembers.filter({
                         $0["MemberID"] == myCell.lblMemberID.text
                     })
                 }
             } else {
                 if self.filteredMembers.count == 0 {
-                    
-                    for var i = 0; i < self.scanInPunch.count; ++i {
-                        if self.scanInPunch[i]["MemberID"] == self.unfilteredMembers[row]["MemberID"]{
-                        print(" if self.scanInPunch[\(i)][MemberID] == self.unfilteredMembers[row][MemberID]")
-                        self.scanInPunch.removeAtIndex(i)
-                        }
-
-                    }
-                    for var i = 0; i < self.scanInPunch.count; ++i {
-                        if self.scanInPunch[i]["MemberID"] != self.unfilteredMembers[row]["MemberID"]{
-                            print("if self.scanInPunch[\(i)][MemberID] != self.unfilteredMembers[row][MemberID]")
-                            self.scanInPunch.append(self.unfilteredMembers[row])
-                        }
-                    }
-                    
-                } else {
-                    for var i = 0; i < self.scanInPunch.count; ++i {
-                        if self.scanInPunch[i]["MemberID"] == self.filteredMembers[row]["MemberID"]{
-                            print("if self.scanInPunch[i][MemberID] == self.filteredMembers[row][MemberID]")
-                        }
-                    }
-
-                    self.scanInPunch.append(self.filteredMembers[row])
-                }
-            }
-            
-            self.punchMembers = self.scanInPunch
-            
-            
-            
-            /*for dics in self.punchMembers {
-                print("----------------LOOP START")
-                if noDuplicates.containsObject(dics){
-                    
-                    if !duplicates.containsObject(dics){
-                        duplicates.addObject(dics)
-                        for disc in duplicates {
-                            
+                    for disc in self.punchMembers {
+                        if disc["MemberID"] == self.unfilteredMembers[row]["MemberID"]{
                             for var i = 0; i < self.punchMembers.count; ++i{
-                                if self.punchMembers[i] == disc as! [String : String]{
-                                    print("if self.punchMembers[\(i)] == disc as! [String : String]\n")
-                                    print("self.punchMembers[\(i)] = \(self.punchMembers[i])")
+                                if self.punchMembers[i] == disc {
                                     self.punchMembers.removeAtIndex(i)
-                                    
-                                    print("after removeAtIndex self.punchMembers[\(i)] = \(self.punchMembers[i])")
-                                    print("disc = \(disc)")
-                                }
-                            }
-                            for var i = 0; i < self.scanInPunch.count; ++i {
-                                if self.scanInPunch[i] == disc as! [String: String] {
-                                    self.scanInPunch.removeAtIndex(i)
-                                    print("if self.scanInPunch[\(i)] == disc as! [String: String]")
-                                    print("self.scanInPunch[\(i)] = \(self.scanInPunch[i])")
-                                    print("disc = \(disc)")
-
                                 }
                             }
                         }
                     }
+                self.punchMembers.append(self.unfilteredMembers[row])
+                } else {
+                    for disc in self.punchMembers {
+                        if disc["MemberID"] == self.filteredMembers[row]["MemberID"]{
+                            for var i = 0; i < self.punchMembers.count; ++i{
+                                if self.punchMembers[i] == disc {
+                                    self.punchMembers.removeAtIndex(i)
+                                }
+                            }
+                        }
+                    }
+                    self.punchMembers.append(self.filteredMembers[row])
                 }
-                else{
-                    noDuplicates.addObject(dics)
-                }
-                
-                print("duplicates = \(duplicates)\n")
-                print("noDuplicates =\(noDuplicates)\n")
-                
-                
-                
-                //to find the duplicate items key
-                for dics in duplicates{
-                    print("dics = \(dics)\n")
-                }
-                print("-----------------------Loop end")
-                
-            }*/
-        
-            print("self.punchMembers = \(self.punchMembers)\n")
-        
-            
-            for var i = 0; i < self.punchMembers.count; ++i {
-               
-                self.punchMembers[i]["Status"] = "In"
-                print("self.punchMembers[\(i)] = \(self.punchMembers[i])")
             }
-        
+            for var i = 0; i < self.punchMembers.count; ++i {
+                self.punchMembers[i]["Status"] = "In"
+            }
         }
         
         if self.attendMethod == "Out"{
-            if self.scanOutPunch.count == 0 {
+            if self.punchMembers.count == 0 {
                 if self.filteredMembers.count > 0{
-                    self.scanOutPunch = self.filteredMembers.filter({
+                    self.punchMembers = self.filteredMembers.filter({
                         $0["MemberID"] == myCell.lblMemberID.text
                     })
                 } else {
-                    self.scanOutPunch = self.unfilteredMembers.filter({
+                    self.punchMembers = self.unfilteredMembers.filter({
                         $0["MemberID"] == myCell.lblMemberID.text
                     })
                 }
             } else {
                 if self.filteredMembers.count == 0 {
-                    self.scanOutPunch.append(self.unfilteredMembers[row])
-                } else {
-                    self.scanOutPunch.append(self.filteredMembers[row])
-                }
-            }
-            self.punchMembers = self.scanOutPunch
-            
-            for dics in self.punchMembers {
-                print("----------------LOOP START")
-                if noDuplicates.containsObject(dics){
-                    
-                    if !duplicates.containsObject(dics){
-                        duplicates.addObject(dics)
-                        self.punchMembers.removeLast()
-                        self.punchMembers.removeLast()
-                        self.scanOutPunch.removeLast()
-                        self.scanOutPunch.removeLast()
+                    for disc in self.punchMembers {
+                        if disc["MemberID"] == self.unfilteredMembers[row]["MemberID"]{
+                            for var i = 0; i < self.punchMembers.count; ++i{
+                                if self.punchMembers[i] == disc {
+                                    print(self.punchMembers[i])
+                                    print(disc)
+                                    self.punchMembers.removeAtIndex(i)
+                                }
+                            }
+                        }
                     }
+                    self.punchMembers.append(self.unfilteredMembers[row])
+                } else {
+                    for disc in self.punchMembers {
+                        if disc["MemberID"] == self.filteredMembers[row]["MemberID"]{
+                            for var i = 0; i < self.punchMembers.count; ++i{
+                                if self.punchMembers[i] == disc {
+                                    self.punchMembers.removeAtIndex(i)
+                                }
+                            }
+                        }
+                    }
+                    self.punchMembers.append(self.filteredMembers[row])
                 }
-                else{
-                    noDuplicates.addObject(dics)
-                }
-                
-                print("duplicates = \(duplicates)\n")
-                print("noDuplicates =\(noDuplicates)\n")
-                
-                
-                
-                //to find the duplicate items key
-                for dics in duplicates{
-                    print("dics = \(dics)\n")
-                }
-                print("-----------------------Loop end")
-                
             }
-
-            
             for var i = 0; i < self.punchMembers.count; ++i {
                 self.punchMembers[i]["Status"] = "Out"
-                print("self.punchMembers[\(i)] = \(self.punchMembers[i])")
-
             }
-
         }
-        
         self.tableView.reloadData()
     }
     
@@ -390,79 +306,25 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
         let row = indexPath.row
-        
-        let myCell = tableView.cellForRowAtIndexPath(indexPath) as! BatchTableViewCell
-        
-        let signIn = UITableViewRowAction(style: .Normal, title: "Scan In"){ action, index in
-            
-            if self.scanInPunch.count == 0 {
-                if self.filteredMembers.count > 0{
-                    self.scanInPunch = self.filteredMembers.filter({
-                        $0["MemberID"] == myCell.lblMemberID.text
-                    })
-                } else {
-                    self.scanInPunch = self.unfilteredMembers.filter({
-                        $0["MemberID"] == myCell.lblMemberID.text
-                    })
-                }
-            } else {
-                if self.filteredMembers.count == 0 {
-                    self.scanInPunch.append(self.unfilteredMembers[row])
-                } else {
-                    self.scanInPunch.append(self.filteredMembers[row])
-                }
-            }
-            self.punchMembers = self.scanInPunch
-            
-            for var i = 0; i < self.punchMembers.count; ++i {
-                self.punchMembers[i]["Status"] = "In"
-            }
+        let remove = UITableViewRowAction(style: .Normal, title: "Remove"){ action, index in
             for var i = 0; i < self.punchMembers.count; ++i{
-                
-            }
-            self.tableView.reloadData()
-        }
-        signIn.backgroundColor = UIColor.blueColor()
-        
-        let signOut = UITableViewRowAction(style: .Normal, title: "Scan Out"){ action, index in
-            
-            if self.scanOutPunch.count == 0 {
-                if self.filteredMembers.count > 0{
-                    self.scanOutPunch = self.filteredMembers.filter({
-                        $0["MemberID"] == myCell.lblMemberID.text
-                    })
+                if self.filteredMembers.count == 0{
+                    if self.punchMembers[i]["MemberID"] == self.unfilteredMembers[row]["MemberID"]{
+                        self.punchMembers.removeAtIndex(i)
+                    }
                 } else {
-                    self.scanOutPunch = self.unfilteredMembers.filter({
-                        $0["MemberID"] == myCell.lblMemberID.text
-                    })
-                }
-            } else {
-                if self.filteredMembers.count == 0 {
-                    self.scanOutPunch.append(self.unfilteredMembers[row])
-                } else {
-                    self.scanOutPunch.append(self.filteredMembers[row])
+                    if self.punchMembers[i]["MemberID"] == self.filteredMembers[row]["MemberID"]{
+                        self.punchMembers.removeAtIndex(i)
+                    }
                 }
             }
-            self.punchMembers = self.scanOutPunch
-            
-            for var i = 0; i < self.punchMembers.count; ++i {
-                self.punchMembers[i]["Status"] = "Out"
-            }
-            for var i = 0; i < self.punchMembers.count; ++i{
-                
-            }
             self.tableView.reloadData()
         }
-        signOut.backgroundColor = UIColor.redColor()
-        
-        let cancel = UITableViewRowAction(style: .Normal, title: "Cancel"){ action, index in
-            myCell.lblStatus.text = ""
-            self.tableView.reloadData()
-        }
-        cancel.backgroundColor = UIColor.grayColor()
-        
-        return [cancel, signOut, signIn]
+        remove.backgroundColor = UIColor.grayColor()
+        return [remove]
     }
+    
+        
 
     /*
     // MARK: - Navigation

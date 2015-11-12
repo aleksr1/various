@@ -84,9 +84,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     var childIn : [String] = []
     var childIn2 : [String] = []
     let textCellIdentifier = "TextCell"
-    let swiftBlogs = ["Ray Wenderlich", "NSHipster", "iOS Developer Tips", "Jameson Quave", "Natasha The Robot", "Coding Explorer", "That Thing In Swift", "Andrew Bancroft", "iAchieved.it", "Airspeed Velocity"]
-    
-    
+    var punchMembers = [Dictionary<String,String>]()    
 
     
     lazy var activityPopoverContentController: UINavigationController = {
