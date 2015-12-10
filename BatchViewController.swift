@@ -20,15 +20,29 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
     var searchController: UISearchController!
     var acceptBarButtonItem: UIBarButtonItem!
     var attendMethod = ""
+    var unitName = "" 
+    var activityName = ""
+    var siteCode = "2000"
+    var dateTime = ""
+    var useCurrentTime:Bool?
+    var record = [Dictionary<String,String>]()
     
      override func viewDidLoad() {
         super.viewDidLoad()
-        acceptBarButtonItem = UIBarButtonItem(title: "Accept", style: .Plain, target: self, action: "performCancel")
-        navigationItem.rightBarButtonItem = acceptBarButtonItem
         performRefresh()
         configureSearchController()
-        print(attendMethod)
         
+        if useCurrentTime == true {
+            self.dateTime = printTimestamp()
+        
+        }
+        print("attendMethod = \(attendMethod), unitName = \(unitName), activityName = \(activityName), dateTime = \(dateTime)")
+    }
+    
+    func printTimestamp() -> String {
+        let timestamp = NSDateFormatter.localizedStringFromDate(NSDate(), dateStyle: .MediumStyle, timeStyle: .ShortStyle)
+        print(timestamp)
+        return timestamp
     }
     
     //10-21-15 SearchBar code updates
@@ -106,9 +120,27 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
                     //DO Error Alert
                  }
         }
+        print("performRefresh \(self.unfilteredMembers)")
     }
     
-    func performCancel(){
+    func sendPunch(siteCode: String, memberID: String, unitName:String, activityName:String, dateTime:String, status:String ){
+        let record = [ "record" : [ "SiteCode" : siteCode, "MemberID" : memberID, "UnitName" : unitName, "ActivityName" : activityName, "DateTime" : dateTime, "Status" : status ] ]
+       
+        let header = [
+            "X-Dreamfactory-Application-Name" : "QEMobile"
+        ]
+        
+        Alamofire.request(.POST, "http://192.5.31.22:92/rest/Test/Punch", parameters: record, headers: header)
+            .responseJSON { (request, response, data) in
+                //print(request)
+                //print("sendPunch \(response)")
+                //print(data)
+                
+        }
+    }
+
+    
+    func performAccept(){
         dismissViewControllerAnimated(true, completion: nil)
     
     }
@@ -254,6 +286,11 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
             }
             for var i = 0; i < self.punchMembers.count; ++i {
                 self.punchMembers[i]["Status"] = "In"
+                self.punchMembers[i]["UnitName"] = unitName
+                self.punchMembers[i]["ActivityName"] = activityName
+                self.punchMembers[i]["SiteCode"] = siteCode
+                self.punchMembers[i]["DateTime"] = dateTime
+                print(self.punchMembers[i])
             }
         }
         
@@ -297,6 +334,12 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
             }
             for var i = 0; i < self.punchMembers.count; ++i {
                 self.punchMembers[i]["Status"] = "Out"
+                self.punchMembers[i]["UnitName"] = unitName
+                self.punchMembers[i]["ActivityName"] = activityName
+                self.punchMembers[i]["SiteCode"] = siteCode
+                self.punchMembers[i]["DateTime"] = dateTime
+                print(self.punchMembers[i])
+
             }
         }
         self.tableView.reloadData()
@@ -322,6 +365,29 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
         }
         remove.backgroundColor = UIColor.grayColor()
         return [remove]
+    }
+    
+    
+    
+
+    
+    @IBAction func pressAccept(sender: AnyObject) {
+        
+        
+        if self.punchMembers.count > 0 {
+           
+            for var i = 0; i < self.punchMembers.count; ++i{
+                
+                sendPunch(siteCode, memberID: self.punchMembers[i]["MemberID"]!, unitName: unitName, activityName: activityName, dateTime: dateTime, status: self.punchMembers[i]["Status"]!)
+                
+                if i == self.punchMembers.count - 1{
+                    self.performSegueWithIdentifier("unwindBatch", sender: self)
+
+                }
+            }
+        }
+        
+        
     }
     
         

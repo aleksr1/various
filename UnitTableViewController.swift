@@ -60,7 +60,7 @@ class UnitTableViewController: UITableViewController {
         let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.HTTPMethod = "GET"
         
-        var JSONSerializationError: NSError? = nil
+        //var JSONSerializationError: NSError? = nil
         
         mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
         
@@ -69,19 +69,19 @@ class UnitTableViewController: UITableViewController {
                 switch result {
                 case .Success(let data):
                     let json = JSON(data)
-                    let record = json["record"].string
+                    //let record = json["record"].string
                     var indexValue = 0
+                    //print(json)
                     
                     
-                    
-                    for (index, item) in json["record"] {
+                    for (_, _) in json["record"] {
                         let indvItem = json["record"][indexValue]["Unitname"].stringValue
-                        print(indvItem)
+                        //print(indvItem)
                         self.items.insert(indvItem, atIndex: indexValue)
                         indexValue++
                     }
                     self.tableView.reloadData()
-                    
+                  
                 case .Failure(_, let error):
                     print("request failed with error: \(error)")
                 }
@@ -99,13 +99,13 @@ class UnitTableViewController: UITableViewController {
         preferredContentSize = CGSize(width: 300, height: 300)
         if (self.items.count > 1)
         {
-            print("if viewWillAppear and items contains : \(self.items)", terminator: "")
+            //print("if viewWillAppear and items contains : \(self.items)", terminator: "")
             performRefresh()
-            print("if performRefresh() viewWillAppear and items contains : \(self.items)", terminator: "")
+            //print("if performRefresh() viewWillAppear and items contains : \(self.items)", terminator: "")
             
             self.tableView.reloadData()
         } else {
-            print("else viewWillAppear and items contains : \(self.items)", terminator: "")
+            //print("else viewWillAppear and items contains : \(self.items)", terminator: "")
         }
 
     }
@@ -113,13 +113,13 @@ class UnitTableViewController: UITableViewController {
     override func viewWillDisappear(animated: Bool) {
         //self.items = ["disappear"]
         self.tableView.reloadData()
-        print("viewWillDisappear()", terminator: "")
+        
         
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        print("didReceiveMemoryWarning()", terminator: "")
+        
     }
 
     
@@ -138,13 +138,13 @@ class UnitTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier(TableViewValues.identifier, forIndexPath: indexPath) as? UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(TableViewValues.identifier, forIndexPath: indexPath) as UITableViewCell
         
         
-        cell?.textLabel?.text = self.items[indexPath.row]
+        cell.textLabel?.text = self.items[indexPath.row]
        
         //println("cellForRowAtIndexPath: \(self.items[indexPath.row])")
-        return cell!
+        return cell
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -156,8 +156,8 @@ class UnitTableViewController: UITableViewController {
         let selectedItem = items[indexPath]
         selectionHandler?(selectedItem: selectedItem)
         dismissViewControllerAnimated(true, completion: nil)
-        self
-        //println(self.items[indexPath.row])
+        //self
+        print("didSelect \(self.items[indexPath.row])")
     }
 
 }

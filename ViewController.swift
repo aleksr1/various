@@ -10,44 +10,8 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-extension NSDate
-{
-    func hour() -> Int
-    {
-        //Get Hour
-        let calendar = NSCalendar.currentCalendar()
-        let components = calendar.components(.Hour, fromDate: self)
-        let hour = components.hour
-        
-        //Return Hour
-        return hour
-    }
-    
-    
-    func minute() -> Int
-    {
-        //Get Minute
-        let calendar = NSCalendar.currentCalendar()
-        let components = calendar.components(.Minute, fromDate: self)
-        let minute = components.minute
-        
-        //Return Minute
-        return minute
-    }
-    
-    func toShortTimeString() -> String
-    {
-        //Get Short Time String
-        let formatter = NSDateFormatter()
-        formatter.timeStyle = .ShortStyle
-        let timeString = formatter.stringFromDate(self)
-        
-        //Return Short Time String
-        return timeString
-    }
-}
 
-class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate{
+class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIPopoverPresentationControllerDelegate {
     
     
     
@@ -57,6 +21,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     @IBOutlet weak var btnIn: UIButton!
     @IBOutlet weak var activityLabel: UILabel!
     @IBOutlet weak var btnHistoryOne: UIButton!
+    @IBOutlet var timeSwitch: UISwitch!
     
    
     @IBOutlet weak var tfTimeDate: UITextField!
@@ -78,51 +43,34 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     var personID = ""
     var unitName = ""
     var activityName = ""
-    var time = ""
-    var inOut = ""
+    var dateTime = ""
+    var status = ""
+    var siteCode = ""
     //var child:Child!
     var childIn : [String] = []
     var childIn2 : [String] = []
     let textCellIdentifier = "TextCell"
-    var punchMembers = [Dictionary<String,String>]()    
+    var punchMembers = [Dictionary<String,String>]()
+    var punchBatchMembers = [Dictionary<String, String>]()
+    var membersData = [Dictionary<String, String>]()
+    
 
-    
-    lazy var activityPopoverContentController: UINavigationController = {
-        let controller = ActivityTableViewController(style: .Plain)
-        controller.selectionHandler = self.activitySelectionHandler
-        let navigationController = UINavigationController(rootViewController: controller)
-        return navigationController
-        }()
-    
-    lazy var activityPopoverController: UIPopoverController = {
-        // DO WORK TO PREVENT OPENING ACTIVITY DROP DOWN UNLESS UNIT AND TIME ARE SELECTED
-        
-        return UIPopoverController(contentViewController: self.activityPopoverContentController)
-        }()
-    
-    
-    lazy var unitPopoverContentController: UINavigationController = {
-        let controller = UnitTableViewController(style: .Plain)
-        controller.selectionHandler = self.unitSelectionHandler
-        let navigationController = UINavigationController(rootViewController: controller)
-        return navigationController
-        }()
-    
-    lazy var unitPopoverController: UIPopoverController = {
-        return UIPopoverController(contentViewController: self.unitPopoverContentController)
-        }()
-
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
         
         popDatePicker = PopDatePicker(forTextField: tfTimeDate)
-        
+        performRefresh()
         tfTimeDate.delegate = self
-    
+        printTimestamp()
     }
+    
+    func printTimestamp() -> String {
+        let timestamp = NSDateFormatter.localizedStringFromDate(NSDate(), dateStyle: .MediumStyle, timeStyle: .ShortStyle)
+        return timestamp
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -131,8 +79,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
+        self.tableView.reloadData()
     }
+    
+    
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
@@ -148,11 +98,47 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
     }
     
-    @IBAction func activityButton(sender: UIBarButtonItem) {
-        activityPopoverController.presentPopoverFromBarButtonItem(sender, permittedArrowDirections: .Any, animated: true)
+    @IBAction func newActivityButton(sender: UIBarButtonItem) {
+        let tableViewController = ActivityTableViewController()
+        tableViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
+        
+        tableViewController.selectionHandler = self.activitySelectionHandler
+        
+        let popoverPresentationController = tableViewController.popoverPresentationController
+        popoverPresentationController?.delegate = self
+        popoverPresentationController?.sourceView = self.view
+        popoverPresentationController?.permittedArrowDirections = .Any
+        
+        popoverPresentationController?.barButtonItem = sender as UIBarButtonItem
+        
+        if unitLabel.text == "Unit"{
+            let alert = UIAlertController(title: "Error", message: "Please select a unit", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        } else {
+            presentViewController(tableViewController, animated: true, completion: nil)
+        }
+
+        
+        
+    }
+    
+    @IBAction func newUnitButton(sender: UIBarButtonItem) {
+        let tableViewController = UnitTableViewController()
+        tableViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
+        tableViewController.selectionHandler = self.unitSelectionHandler
+        
+        
+        let popoverPresentationController = tableViewController.popoverPresentationController
+        popoverPresentationController?.delegate = self
+        popoverPresentationController?.sourceView = self.view
+        popoverPresentationController?.permittedArrowDirections = .Any
+        
+        popoverPresentationController?.barButtonItem = sender as UIBarButtonItem
+        presentViewController(tableViewController, animated: true, completion: nil)
+        
     }
    
-    
     
     func unitSelectionHandler(selectedItem: String){
         self.selectedItem = selectedItem
@@ -163,9 +149,6 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
     }
     
-    @IBAction func unitButton(sender: UIBarButtonItem) {
-        unitPopoverController.presentPopoverFromBarButtonItem(sender, permittedArrowDirections: .Any, animated: true)
-    }
     @IBAction func inOut(sender: UIButton) {
         if sender == self.btnIn {
             self.lblInOut.text = "In"
@@ -181,7 +164,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     
     @IBAction func currentTimeSwitch(sender: UISwitch) {
         if sender.on {
-            timeDateHolder = self.tfTimeDate.text!
+            
             print("if sender.on timeDateHolder contains : \(timeDateHolder)")
             self.tfTimeDate.text = ""
             self.tfTimeDate.enabled = false
@@ -199,7 +182,31 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
     }
     
-   
+    func performRefresh(){
+        let URL = NSURL(string:"http://192.5.31.22:92/rest/Test/Members")!
+        let mutableURLRequest = NSMutableURLRequest(URL: URL)
+        mutableURLRequest.HTTPMethod = "GET"
+        mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
+        
+        Alamofire.request(mutableURLRequest)
+            .responseJSON { (request, response, result) in
+                switch result {
+                case .Success(let data):
+                    //print(data)
+                    let swiftyJSONVar = JSON(data)
+                    if let resData = swiftyJSONVar["record"].arrayObject{
+                        self.membersData = resData as! [[String: String]]
+                    }
+                    //print("performRefresh \(self.argBlarg)")
+                case .Failure(_, let error):
+                    print("request failed with error: \(error)")
+                    
+                    //DO Error Alert
+                }
+        }
+        
+        
+    }
     
     @IBAction func enterBtn(sender: AnyObject) {
        
@@ -207,85 +214,97 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         if(lblResult.text == "") {
             self.tableView.reloadData()
         } else {
-        
+            siteCode = "2000"
             personID = lblResult.text!
             unitName = unitLabel.text!
             activityName = activityLabel.text!
-            time = tfTimeDate.text!
-            inOut = lblInOut.text!
+            dateTime = tfTimeDate.text!
+            status = lblInOut.text!
             lblResult.text = ""
-            let stringOne = String(format: "%@ -- %@ -- %@ --  %@", personID, unitName, activityName, time)
+            let stringOne = String(format: "%@ -- %@ -- %@ --  %@", personID, unitName, activityName, dateTime, status)
             print(stringOne)
-            childIn.append(personID)
-            self.tableView.reloadData()
+            //childIn.append(personID)
+            
         }
-        
-        //btnHistoryOne.setTitle(stringOne, forState: UIControlState.Normal)
+        let first = ["SiteCode": siteCode]
+        for var i = 0; i < self.membersData.count; ++i{
+            if personID == self.membersData[i]["MemberID"]{
+                
+                sendPunch(siteCode, memberID: personID, unitName: unitName, activityName: activityName, dateTime: dateTime, status: status)
+                
+                if self.punchMembers.count > 0 {
+                    self.punchMembers.append(first)
+                    let tempElement = self.punchMembers.count  - 1
+                    self.punchMembers[tempElement]["MemberID"] = personID
+                    self.punchMembers[tempElement]["UniteName"] = unitName
+                    self.punchMembers[tempElement]["ActivityName"] = activityName
+                    self.punchMembers[tempElement]["DateTime"] = dateTime
+                    self.punchMembers[tempElement]["Status"] = status
+                    for var i = 0; i < self.membersData.count; ++i{
+                        if self.punchMembers[tempElement]["MemberID"] == self.membersData[i]["MemberID"]{
+                            self.punchMembers[tempElement]["FirstName"] = self.membersData[i]["FirstName"]
+                            self.punchMembers[tempElement]["LastName"] = self.membersData[i]["LastName"]
+                        }
+                    }
+
+                } else {
+                    print(first)
+                    print(self.punchMembers)
+                    self.punchMembers.append(first)
+                    self.punchMembers[0]["MemberID"] = personID
+                    self.punchMembers[0]["UniteName"] = unitName
+                    self.punchMembers[0]["ActivityName"] = activityName
+                    self.punchMembers[0]["DateTime"] = dateTime
+                    self.punchMembers[0]["Status"] = status
+                    for var i = 0; i < self.membersData.count; ++i{
+                        if self.punchMembers[0]["MemberID"] == self.membersData[i]["MemberID"]{
+                            self.punchMembers[0]["FirstName"] = self.membersData[i]["FirstName"]
+                            self.punchMembers[0]["LastName"] = self.membersData[i]["LastName"]
+                        }
+                    }
+
+                }
+            } else {
+                print(personID)
+                print(self.membersData[i]["MemberID"])
+            }
+        }
       
-        /*let record = [
-            "record" :[
-                "PersonID" : personID,
-                "Unitname" : unitName,
-                "Activityname" : activityName,
-                "DateTime" : time,
-                "InOut" : inOut
-        ]]
-        println(record)
-        let URL = NSURL(string: "http://192.5.31.22:92/rest/Test/SignIn")!
+        self.tableView.reloadData()
+
+    }
+    
+    func sendPunch(siteCode: String, memberID: String, unitName:String, activityName:String, dateTime:String, status:String ){
+        let record = [ "record" : [ "SiteCode" : siteCode, "MemberID" : memberID, "UnitName" : unitName, "ActivityName" : activityName, "DateTime" : dateTime, "Status" : status ] ]
+        
+        let URL = NSURL(string: "http://192.5.31.22:92/rest/Test/Punch")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.HTTPMethod = "POST"
-        var JSONSerializationError: NSError? = nil
-        
-        //Use for adding parameters
-        mutableURLRequest.HTTPBody = NSJSONSerialization.dataWithJSONObject(record, options: nil, error: &JSONSerializationError)
-        
         mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
-        
-        Alamofire.request(mutableURLRequest)
-        .responseJSON { (request, response, data, error) in
-            //println(request)
-            //println(response)
-            println(data)
-            }*/
+        let header = [
+            "X-Dreamfactory-Application-Name" : "QEMobile"
+        ]
 
-
-    }
-    
-    
-    
-    
-    func sideBarDidSelectButtonAtIndex(index: Int) {
-        
-        let alertView = UIAlertController(title: "Under Development", message: "This portion of the application is currently disabled", preferredStyle: .Alert)
-        
-        alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-        
-        
-        
-        if index == 0{
-            self.performSegueWithIdentifier("mainToConfigSegue", sender: nil);
-            
-        } else if index == 1 {
-                        presentViewController(alertView, animated: true, completion: nil)
-
-        } else if index == 2 {
-                        presentViewController(alertView, animated: true, completion: nil)
-
+        Alamofire.request(.POST, "http://192.5.31.22:92/rest/Test/Punch", parameters: record, headers: header)
+            .responseJSON { (request, response, data) in
+                print(request)
+                print("sendPunch \(response)")
+                print(data)
+                
         }
     }
     
+    
     @IBAction func btnNumber(sender: UIButton) {
-         var num = sender.currentTitle
-        
-        
-            lblResult.text = lblResult.text! + num!
-       
-        
+        let num = sender.currentTitle
+        lblResult.text = lblResult.text! + num!
     }
+    
     @IBAction func btnClear(sender: UIButton) {
         lblResult.text = ""
        
     }
+    
     @IBAction func btnBack(sender: UIButton) {
         if(lblResult.text == "") {
         
@@ -297,15 +316,14 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     }
     
     
-    /*@IBAction func unwindBatchToHome(segue:UIStoryboardSegue){
-        if let svc = segue.sourceViewController as? TestBatchViewController{
-        
-                self.childIn += svc.signInArray + svc.signOutArray
-                self.tableView.reloadData()
-            
+    @IBAction func unwindBatchToHome(segue: UIStoryboardSegue){
+        if let controller = segue.sourceViewController as? BatchViewController{
+            self.punchMembers += controller.punchMembers
+            print("unwindBatchToHome self.punchMembers:\(self.punchMembers)")
         }
-        
-    }*/
+    }
+    
+    
     
     @IBAction func unwindConfigAccept(segue: UIStoryboardSegue){
         if let controller = segue.sourceViewController as? ConfigViewController {
@@ -354,7 +372,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
     }
    
-    @IBAction func test(sender: UITextField) {
+    func test(sender: UITextField) {
         
         NSLog("textField %@", sender.description)
         resign()
@@ -362,7 +380,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         formatter.dateStyle = .MediumStyle
         formatter.timeStyle = .NoStyle
         let initDate = formatter.dateFromString(tfTimeDate.text!)
-        let forTextField = tfTimeDate
+        //let forTextField = tfTimeDate
         popDatePicker!.pick(self, initDate:initDate, dataChanged: { (newDate : NSDate, forTextField: UITextField) -> () in
             //NSLog("forTextField %@", forTextField)
             self.tfTimeDate.text = newDate.ToDateMediumString()
@@ -400,7 +418,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
             formatter.dateStyle = .MediumStyle
             formatter.timeStyle = .NoStyle
             let initDate = formatter.dateFromString(tfTimeDate.text!)
-            let forTextField = tfTimeDate
+            //let forTextField = tfTimeDate
             popDatePicker!.pick(self, initDate:initDate, dataChanged: { (newDate : NSDate, forTextField: UITextField) -> () in
             NSLog("forTextField %@", forTextField)
             self.tfTimeDate.text = newDate.ToDateMediumString()
@@ -418,7 +436,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return childIn.count
+        return self.punchMembers.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -426,23 +444,36 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
         let row = indexPath.row
      
-        childIn2 = Array(childIn.reverse())
+        
+        
+        var placeholder = Array(self.punchMembers.reverse())
+        let spaceColon = " : "
+        let space = " "
+        if var punchHistory = placeholder[row]["MemberID"]{
+            punchHistory += spaceColon
+            punchHistory += placeholder[row]["FirstName"]!
+            punchHistory += space
+            punchHistory += placeholder[row]["LastName"]!
+            punchHistory += spaceColon
+            punchHistory += placeholder[row]["Status"]!
+            print("/n/npunchhistory/n/n \(punchHistory)")
+            cell.lblOutput.text = punchHistory
+        } else {
+            print("/n/n/n/npunch history not created")
+        }
+        
+        
     
-        cell.lblOutput.text = childIn2[row]
+        
 
       
         
         return cell
     }
     
-    /*func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        
-        let row = indexPath.row
-        println(childIn[row])
-    }*/
+
     
-    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
+    /*func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
         let delete = UITableViewRowAction(style: .Normal, title: "Undo") { action, index in
             let cell = tableView.cellForRowAtIndexPath(indexPath) as!  HistoryTableViewCell
             
@@ -498,16 +529,9 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         share.backgroundColor = UIColor.blueColor()
         
         return [/*share, favorite, */delete]
-    }
+    }*/
     
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // the cells you would like the actions to appear needs to be editable
-        return true
-    }
-    
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        // you need to implement this method too or you can't swipe to display the actions
-    }
+   
     
     // MARK: - Navigation
     
@@ -544,7 +568,19 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
         if segue.identifier == "segueToBatch" {
-            if self.lblInOut.text! == "In" {
+            if let destinationVC = segue.destinationViewController as? BatchViewController{
+                destinationVC.attendMethod = self.lblInOut.text!
+                destinationVC.unitName = self.unitLabel.text!
+                destinationVC.activityName = self.activityLabel.text!
+                if timeSwitch.on {
+                    destinationVC.useCurrentTime = true
+                } else {
+                    destinationVC.dateTime = self.tfTimeDate.text!
+                    destinationVC.useCurrentTime = false
+                }
+                
+            }
+            /*if self.lblInOut.text! == "In" {
                 if let destinationVC = segue.destinationViewController as? BatchViewController{
                     destinationVC.attendMethod = self.lblInOut.text!
                 }
@@ -553,7 +589,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                 if let destinationVC = segue.destinationViewController as? BatchViewController{
                     destinationVC.attendMethod = self.lblInOut.text!
                 }
-            }
+            }*/
         }
     }
 }

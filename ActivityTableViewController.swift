@@ -9,31 +9,13 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
-/*extension Array {
-    subscript(path: NSIndexPath) -> T{
-        return self[path.row]
-    }
-}
 
-extension NSIndexPath {
-    class func firstIndexPath() -> NSIndexPath {
-        return NSIndexPath(forRow: 0, inSection: 0)
-    }
-}*/
 
 class ActivityTableViewController: UITableViewController {
     
     struct TableViewValues {
         static let identifier = "Cell"
     }
-    /*
-    lazy var items: [String] = {
-        var returnValue = [String]()
-        for counter in 1...100{
-            returnValue.append("Activity \(counter)")
-        }
-        return returnValue
-        }()*/
     var items: [String] = []
     
    
@@ -42,18 +24,10 @@ class ActivityTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
-        
         tableView.registerClass(UITableViewCell.classForCoder(), forCellReuseIdentifier: TableViewValues.identifier)
         cancelBarButtonItem = UIBarButtonItem(title: "Cancel", style: .Plain, target: self, action: "performCancel")
         navigationItem.leftBarButtonItem = cancelBarButtonItem
-        
-        
         performRefresh()
-        print("viewDidLoad()", terminator: "")
-        
-        
     }
     
     func performCancel(){
@@ -67,7 +41,7 @@ class ActivityTableViewController: UITableViewController {
         let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.HTTPMethod = "GET"
         
-        var JSONSerializationError: NSError? = nil
+        //var JSONSerializationError: NSError? = nil
         
         mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
         
@@ -78,12 +52,12 @@ class ActivityTableViewController: UITableViewController {
                 switch result {
                 case .Success(let data):
                     let json = JSON(data)
-                    let record = json["record"].string
+                    //let record = json["record"].string
                     var indexValue = 0
                     
                     
                     
-                    for (index, item) in json["record"] {
+                    for (_, _) in json["record"] {
                         let indvItem = json["record"][indexValue]["Activityname"].stringValue
                         print(indvItem)
                         self.items.insert(indvItem, atIndex: indexValue)
@@ -103,29 +77,19 @@ class ActivityTableViewController: UITableViewController {
         preferredContentSize = CGSize(width: 300, height: 300)
         if (self.items.count > 1)
         {
-            print("if viewWillAppear and items contains : \(self.items)", terminator: "")
             performRefresh()
-            print("if performRefresh() viewWillAppear and items contains : \(self.items)", terminator: "")
-
             self.tableView.reloadData()
         } else {
-            print("else viewWillAppear and items contains : \(self.items)", terminator: "")
         }
-        //performRefresh()
-        //println("viewWillAppear()")
-    }
+            }
     
     override func viewWillDisappear(animated: Bool) {
-        //self.items = ["disappear"]
         self.tableView.reloadData()
-        print("viewWillDisappear()", terminator: "")
-
     }
 
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        print("didReceiveMemoryWarning()", terminator: "")
     }
 
     // MARK: - Table view data source
@@ -144,13 +108,13 @@ class ActivityTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier(TableViewValues.identifier, forIndexPath: indexPath) as? UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(TableViewValues.identifier, forIndexPath: indexPath) as UITableViewCell
         
         
         
-        cell?.textLabel?.text = items[indexPath]
+        cell.textLabel?.text = items[indexPath]
         
-        return cell!
+        return cell
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
