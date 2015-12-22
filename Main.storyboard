@@ -405,15 +405,7 @@
                                     <rect key="frame" x="495" y="438" width="146" height="36"/>
                                 </variation>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rbc-Dl-sth">
-                                <rect key="frame" x="0.0" y="-30" width="97" height="30"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <textInputTraits key="textInputTraits"/>
-                                <variation key="heightClass=regular-widthClass=regular" fixedFrame="YES">
-                                    <rect key="frame" x="459" y="482" width="212" height="30"/>
-                                </variation>
-                            </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="In/Out" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iOZ-cv-syh">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iOZ-cv-syh">
                                 <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -422,7 +414,7 @@
                                     <rect key="frame" x="459" y="314" width="212" height="36"/>
                                 </variation>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unit" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Se4-kJ-3b0">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Se4-kJ-3b0">
                                 <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -431,7 +423,7 @@
                                     <rect key="frame" x="16" y="72" width="215" height="36"/>
                                 </variation>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Activity" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tCf-FS-7hS">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tCf-FS-7hS">
                                 <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -522,7 +514,7 @@
                                 <color key="backgroundColor" red="0.36214143729999998" green="0.51681729369999996" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="25"/>
                                 <color key="tintColor" red="0.53892001239999998" green="0.60723805409999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="Configure prefixs">
+                                <state key="normal" title="Config prefixes">
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -584,6 +576,14 @@
                                     <segue destination="6kE-8z-UGj" kind="show" identifier="segueToBatch" id="vqZ-Z1-Xkd"/>
                                 </connections>
                             </button>
+                            <textField opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="rbc-Dl-sth">
+                                <rect key="frame" x="0.0" y="-30" width="97" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <variation key="heightClass=regular-widthClass=regular" fixedFrame="YES">
+                                    <rect key="frame" x="459" y="482" width="212" height="30"/>
+                                </variation>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" red="0.62641110827133395" green="0.70620707782646686" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <variation key="default">
@@ -608,7 +608,6 @@
                                 <exclude reference="gGz-1O-UdE"/>
                                 <exclude reference="sEW-oL-h04"/>
                                 <exclude reference="gkY-xe-0jt"/>
-                                <exclude reference="rbc-Dl-sth"/>
                                 <exclude reference="iOZ-cv-syh"/>
                                 <exclude reference="Se4-kJ-3b0"/>
                                 <exclude reference="tCf-FS-7hS"/>
@@ -622,6 +621,7 @@
                                 <exclude reference="yWG-vd-5q2"/>
                                 <exclude reference="dwz-Kn-BpD"/>
                                 <exclude reference="bMg-MW-o7K"/>
+                                <exclude reference="rbc-Dl-sth"/>
                             </mask>
                         </variation>
                         <variation key="heightClass=regular-widthClass=regular">
@@ -646,7 +646,6 @@
                                 <include reference="gGz-1O-UdE"/>
                                 <include reference="sEW-oL-h04"/>
                                 <include reference="gkY-xe-0jt"/>
-                                <include reference="rbc-Dl-sth"/>
                                 <include reference="iOZ-cv-syh"/>
                                 <include reference="Se4-kJ-3b0"/>
                                 <include reference="tCf-FS-7hS"/>
@@ -660,6 +659,7 @@
                                 <include reference="yWG-vd-5q2"/>
                                 <include reference="dwz-Kn-BpD"/>
                                 <include reference="bMg-MW-o7K"/>
+                                <include reference="rbc-Dl-sth"/>
                             </mask>
                         </variation>
                     </view>
@@ -695,7 +695,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ShI-ft-ZFo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2508" y="151.5"/>
+            <point key="canvasLocation" x="1885.5" y="133.5"/>
         </scene>
         <!--Config View Controller-->
         <scene sceneID="OUr-zC-i5H">
@@ -875,7 +875,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KOD-4z-XvU" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="ECN-sb-yOg" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3811" y="-298"/>
+            <point key="canvasLocation" x="2801.25" y="-189"/>
         </scene>
         <!--Batch View Controller-->
         <scene sceneID="GtT-XO-CZm">
@@ -985,7 +985,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8Tq-DU-Yr5" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="vPY-gs-DCP" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3811" y="718"/>
+            <point key="canvasLocation" x="2801.25" y="446.25"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Mkh-Nt-jTk">
@@ -1005,7 +1005,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3be-yj-LlU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1369" y="151"/>
+            <point key="canvasLocation" x="1049.25" y="138"/>
         </scene>
     </scenes>
 </document>

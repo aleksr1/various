@@ -32,10 +32,10 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
         performRefresh()
         configureSearchController()
         
-        if useCurrentTime == true {
+        /*if useCurrentTime == true {
             self.dateTime = printTimestamp()
         
-        }
+        }*/
         print("attendMethod = \(attendMethod), unitName = \(unitName), activityName = \(activityName), dateTime = \(dateTime)")
     }
     
@@ -110,15 +110,19 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
                 switch result {
                 case .Success(let data):
                     let swiftyJSONVar = JSON(data)
-                    if let resData = swiftyJSONVar["record"].arrayObject{
-                        self.unfilteredMembers = resData as! [[String: String]]
-                    }
-                    self.tableView.reloadData()
-                case .Failure(_, let error):
-                    print("request failed with error: \(error)")
                     
-                    //DO Error Alert
-                 }
+                    if response?.statusCode == 200 {
+                        if let resData = swiftyJSONVar["record"].arrayObject{
+                            self.unfilteredMembers = resData as! [[String: String]]
+                        }
+                        self.tableView.reloadData()
+                    } else {
+                        self.buildAlert("404")
+                    }
+                    
+                case .Failure(_, _):
+                    self.buildAlert("Offline")
+                }
         }
         print("performRefresh \(self.unfilteredMembers)")
     }
@@ -131,12 +135,35 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
         ]
         
         Alamofire.request(.POST, "http://192.5.31.22:92/rest/Test/Punch", parameters: record, headers: header)
-            .responseJSON { (request, response, data) in
-                //print(request)
-                //print("sendPunch \(response)")
-                //print(data)
-                
+            .responseJSON { (request, response, result) in
+                switch result {
+                case .Success( _):
+                    if response?.statusCode == 200 {
+                        
+                    } else {
+                        self.buildAlert("404")
+                    }
+                case .Failure(_,_):
+                    self.buildAlert("Offline")
+                }
         }
+
+    }
+    
+    func buildAlert(alertype:String){
+        if alertype == "404" {
+            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        
+        if alertype == "Offline" {
+            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        
     }
 
     
@@ -349,7 +376,7 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
         let row = indexPath.row
-        let remove = UITableViewRowAction(style: .Normal, title: "Remove"){ action, index in
+        let undo = UITableViewRowAction(style: .Normal, title: "Undo"){ action, index in
             for var i = 0; i < self.punchMembers.count; ++i{
                 if self.filteredMembers.count == 0{
                     if self.punchMembers[i]["MemberID"] == self.unfilteredMembers[row]["MemberID"]{
@@ -363,8 +390,8 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
             }
             self.tableView.reloadData()
         }
-        remove.backgroundColor = UIColor.grayColor()
-        return [remove]
+        undo.backgroundColor = UIColor.grayColor()
+        return [undo]
     }
     
     
@@ -373,24 +400,30 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     @IBAction func pressAccept(sender: AnyObject) {
         
-        
+        if useCurrentTime == true {
+            dateTime = printTimestamp()
+            print(dateTime) 
+        }
         if self.punchMembers.count > 0 {
-           
+            
             for var i = 0; i < self.punchMembers.count; ++i{
                 
                 sendPunch(siteCode, memberID: self.punchMembers[i]["MemberID"]!, unitName: unitName, activityName: activityName, dateTime: dateTime, status: self.punchMembers[i]["Status"]!)
                 
                 if i == self.punchMembers.count - 1{
                     self.performSegueWithIdentifier("unwindBatch", sender: self)
-
+                    
                 }
             }
         }
         
         
+        
+
+        
     }
     
-        
+    
 
     /*
     // MARK: - Navigation

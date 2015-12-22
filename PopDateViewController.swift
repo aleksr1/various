@@ -24,8 +24,7 @@ class PopDateViewController : UIViewController {
             updatePickerCurrentDate()
         }
     }
-
-    /*override*/ convenience init() {
+    convenience init() {
 
         self.init(nibName: "PopDateViewController", bundle: nil)
     }

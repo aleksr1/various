@@ -25,50 +25,17 @@ class ConfigViewController: UIViewController {
        
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-       super.viewWillDisappear(animated)
-  
-    }
-   
-    
-    
-   
-    
-    @IBAction func btnAccept(sender: AnyObject) {
+   @IBAction func btnAccept(sender: AnyObject) {
         didCancel = "no"
         let alertView = UIAlertController(title: "Error", message: "Prefix cannot exceed two characters.", preferredStyle: .Alert)
-       
         alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-        
         if txtPrefixOne.text!.characters.count > 2 || txtPrefixTwo.text!.characters.count > 2 || txtPrefixThree.text!.characters.count > 2 || txtPrefixFour.text!.characters.count > 2 {
              presentViewController(alertView, animated: true, completion: nil)
         } else {
             self.performSegueWithIdentifier("UnwindConfig", sender: self)
-            var configCancelSegue = 1
-           print("performed segue from accept", terminator: "")
         }
-        
-        
-       
     }
-    /*@IBAction func btnCancel(sender: AnyObject) {
-        didCancel = "yes"
-        
-        self.performSegueWithIdentifier("segueTest", sender: self)
-        println("performed segue from cancel")
-        
-    }*/
-    
+   
     @IBAction func textFieldDoneEditing(sender: UITextField) {
         sender.resignFirstResponder()
     }

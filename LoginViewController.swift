@@ -20,17 +20,14 @@ class LoginViewController: UIViewController {
     var username : String = ""
     var password : String = ""
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name:UIKeyboardWillShowNotification, object: nil);
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object: nil);
-        // Do any additional setup after loading the view.
-    }
+        }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+    
     @IBAction func textFieldDoneEditing(sender: UITextField) {
     txtPassword.resignFirstResponder()
     }
@@ -41,6 +38,7 @@ class LoginViewController: UIViewController {
         txtPassword.resignFirstResponder()
         
     }
+    
     @IBAction func textFieldShouldReturn(sender: UITextField){
         if (sender == txtSiteCode) {
             txtUsername.becomeFirstResponder()
@@ -49,45 +47,21 @@ class LoginViewController: UIViewController {
         }
     
     }
-    // FIX ISSUE WHERE HITTING NEXT WILL CONTINUE TO RAISE THE SCREEN FROM KEYBOARD
-    //RESULTS IN BLACK BAND AT BOTTOM AFTER KEYBOARD DISMISSED
-    //////////////////////////////////////////////////////////
+    
     func keyboardWillShow(sender: NSNotification) {
-        //print("keyboardWillShow Y axis before movement : \(self.view.frame.origin.y)", terminator: "")
-
         if (self.view.frame.origin.y == 0.0){
             self.view.frame.origin.y -= 150
         }
-        
-        //print("keyboardWillShow Y axis after movement : \(self.view.frame.origin.y)", terminator: "")
     }
     
     func keyboardWillHide(sender: NSNotification) {
-        //print("keyboardWillHide Y axis before movement : \(self.view.frame.origin.y)", terminator: "")
         self.view.frame.origin.y += 150
-        //print("keyboardWillHide Y axis after movement : \(self.view.frame.origin.y)", terminator: "")
-
-    }
-    
-    //////////////////////////////////////////////////////////
+       }
     
     @IBAction func loginBtn(sender: UIButton) {
-        sitecode = txtSiteCode.text!
+        /*sitecode = txtSiteCode.text!
         username = txtUsername.text!
         password = txtPassword.text!
-        
-       
-        
-        //var URL = NSURL(string:"http://192.5.31.22:92/rest/Test/Logins?filter=sitecode%3D\(sitecode)AND%20username%3D'\(username)'%20AND%20password%3D'\(password)'")
-        
-        //let mutableURLRequest = NSMutableURLRequest(URL: URL!)
-        //mutableURLRequest.HTTPMethod = "GET"
-        
-        //var JSONSerializationError: NSError? = nil
-        
-        //mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
-        
-        print("http://192.5.31.22:92/rest/Test/Logins?filter=sitecode%3D\(sitecode)AND%20username%3D'\(username)'%20AND%20password%3D'\(password)'")
         
         let header = [
             "X-Dreamfactory-Application-Name" : "QEMobile"
@@ -95,74 +69,86 @@ class LoginViewController: UIViewController {
         
         Alamofire.request(.GET, "http://192.5.31.22:92/rest/Test/Logins?filter=sitecode%3D\(sitecode)AND%20username%3D'\(username)'%20AND%20password%3D'\(password)'", headers: header)                                                                                         //(mutableURLRequest)
             .responseJSON { (request, response, result) in
-                
                 let alertView = UIAlertController(title: "Error", message: "Login failed", preferredStyle: .Alert)
-                
                 alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
                 
                 switch result{
                 case .Success(let data):
                     let json = JSON(data)
-                    
-                    if var siteCode : Int = json["record"][0]["SiteCode"].intValue
-                    {
-                        print("SiteCode: \(siteCode)")
-                        print(json)
+                    if let siteCode : Int = json["record"][0]["SiteCode"].intValue {
                         if siteCode == 0 {
                             self.presentViewController(alertView, animated: true, completion: nil)
-
                         } else {
-                             self.performSegueWithIdentifier("loggedInSegue", sender: self)
+                            self.performSegueWithIdentifier("loggedInSegue", sender: self)
                         }
-                       
-                        
                     } else {
-                        print("else called")
                         self.presentViewController(alertView, animated: true, completion: nil)
                         
-                    }
-                    
-                case .Failure(_, let error):
-                    print(error)
-                    
+                    }case .Failure(_, _):
                     self.presentViewController(alertView, animated: true, completion: nil)
-
-                    
                 }
+        }*/
+        login()
+    }
+    
+    func login(){
+        let alertView = UIAlertController(title: "Error", message: "Login failed", preferredStyle: .Alert)
+        alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
 
-                
-                
-                /*println(data)
-                if (error != nil)
-                {
-                    
-                    println(error)
-                    
-                    self.presentViewController(alertView, animated: true, completion: nil)
-                    
-                } else {
-                    
-                    let json = JSON(data!)
-                    
-                    if let siteCode = json["record"][0]["SiteCode"].stringValue.toInt()
-                    {
-                        println("SiteCode: \(siteCode)")
-                        self.performSegueWithIdentifier("loggedInSegue", sender: self)
-                        
-                    } else {
-                        
-                        self.presentViewController(alertView, animated: true, completion: nil)
-                        
+        sitecode = txtSiteCode.text!
+        username = txtUsername.text!
+        password = txtPassword.text!
+        
+        let header = [
+            "X-Dreamfactory-Application-Name" : "QEMobile"
+        ]
+        
+        Alamofire.request(.GET, "http://192.5.31.22:92/rest/Test/Logins?filter=sitecode%3D\(sitecode)AND%20username%3D'\(username)'%20AND%20password%3D'\(password)'", headers: header)
+            .validate()
+            .responseJSON { (request, response, result) in
+                print(response)
+        
+                switch result{
+                case .Success(let data):
+                    let json = JSON(data)
+                    if response?.statusCode == 200 {
+                        if let siteCode : Int = json["record"][0]["SiteCode"].intValue {
+                            if siteCode == 0 {
+                                self.buildAlert("FailedLoggin")
+                            } else {
+                                self.performSegueWithIdentifier("loggedInSegue", sender: self)
+                            }
+                        } else {
+                            self.buildAlert("FailedLoggin")
+
                     }
                     
-                   
+                    }case .Failure(_, _):
+                       self.buildAlert("Offline")
+                }
+        }
 
-                }*/
-                
-                
+    }
+    
+    func buildAlert(alertype:String){
+        if alertype == "404" {
+            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
         }
         
+        if alertype == "FailedLoggin"{
+            let alertView = UIAlertController(title: "Error", message: "Login failed", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        if alertype == "Offline" {
+            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+       
     }
-   
-
 }

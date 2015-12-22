@@ -17,8 +17,6 @@ class ActivityTableViewController: UITableViewController {
         static let identifier = "Cell"
     }
     var items: [String] = []
-    
-   
     var cancelBarButtonItem: UIBarButtonItem!
     var selectionHandler: ((selectedItem: String) -> Void)?
 
@@ -35,42 +33,50 @@ class ActivityTableViewController: UITableViewController {
     }
     
     func performRefresh(){
-        items = []
-        print("refreshed items: \(items)", terminator: "")
         let URL = NSURL(string:"http://192.5.31.22:92/rest/Test/Activities")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.HTTPMethod = "GET"
-        
-        //var JSONSerializationError: NSError? = nil
-        
         mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
-        
-       
-        
         Alamofire.request(mutableURLRequest)
             .responseJSON { (request, response, result) in
                 switch result {
                 case .Success(let data):
                     let json = JSON(data)
-                    //let record = json["record"].string
                     var indexValue = 0
+                    if response?.statusCode == 200 {
+                        for (_, _) in json["record"] {
+                            let indvItem = json["record"][indexValue]["Activityname"].stringValue
+                            //print(indvItem)
+                            self.items.insert(indvItem, atIndex: indexValue)
+                            indexValue++
+                        }
+                        self.tableView.reloadData()
+                    } else {
+                        self.buildAlert("404")
                     
-                    
-                    
-                    for (_, _) in json["record"] {
-                        let indvItem = json["record"][indexValue]["Activityname"].stringValue
-                        print(indvItem)
-                        self.items.insert(indvItem, atIndex: indexValue)
-                        indexValue++
                     }
-                    self.tableView.reloadData()
-
-                case .Failure(_, let error):
-                    print("request failed with error: \(error)")
+                case .Failure(_, _):
+                    self.buildAlert("Offline")
                 }
-                
-                       }
+        }
     }
+    
+    func buildAlert(alertype:String){
+        if alertype == "404" {
+            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        
+        if alertype == "Offline" {
+            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        
+    }
+
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -101,17 +107,11 @@ class ActivityTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
         return items.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCellWithIdentifier(TableViewValues.identifier, forIndexPath: indexPath) as UITableViewCell
-        
-        
-        
         cell.textLabel?.text = items[indexPath]
         
         return cell

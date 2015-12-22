@@ -28,16 +28,7 @@ class UnitTableViewController: UITableViewController {
         static let identifier = "Cell"
     }
     
-    /*lazy var items: [String] = {
-        var returnValue = [String]()
-        for counter in 1...100{
-            returnValue.append("Unit \(counter)")
-        }
-        return returnValue
-    }()*/
-    
     var items: [String] = []
-    
     var cancelBarButtonItem: UIBarButtonItem!
     var selectionHandler: ((selectedItem: String) -> Void)?
     
@@ -49,18 +40,13 @@ class UnitTableViewController: UITableViewController {
         navigationItem.leftBarButtonItem = cancelBarButtonItem
         
         performRefresh()
-        print("viewDidLoad()", terminator: "")
-        
-    }
+      }
     
     func performRefresh(){
-        print("performRefresh", terminator: "")
         items = []
         let URL = NSURL(string:"http://192.5.31.22:92/rest/Test/Units")!
         let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.HTTPMethod = "GET"
-        
-        //var JSONSerializationError: NSError? = nil
         
         mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
         
@@ -69,25 +55,42 @@ class UnitTableViewController: UITableViewController {
                 switch result {
                 case .Success(let data):
                     let json = JSON(data)
-                    //let record = json["record"].string
                     var indexValue = 0
-                    //print(json)
                     
-                    
-                    for (_, _) in json["record"] {
-                        let indvItem = json["record"][indexValue]["Unitname"].stringValue
-                        //print(indvItem)
-                        self.items.insert(indvItem, atIndex: indexValue)
-                        indexValue++
+                    if response?.statusCode == 200 {
+                        for (_, _) in json["record"] {
+                            let indvItem = json["record"][indexValue]["Unitname"].stringValue
+                            self.items.insert(indvItem, atIndex: indexValue)
+                            indexValue++
+                        }
+                        self.tableView.reloadData()
+                    } else {
+                        self.buildAlert("404")
                     }
-                    self.tableView.reloadData()
+                    
                   
-                case .Failure(_, let error):
-                    print("request failed with error: \(error)")
-                }
+                case .Failure(_, _):
+                    self.buildAlert("Offline")                }
                 
         }
     }
+    
+    func buildAlert(alertype:String){
+        if alertype == "404" {
+            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+        
+        if alertype == "Offline" {
+            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        
+    }
+
     
     func performCancel(){
         dismissViewControllerAnimated(true, completion: nil) 
@@ -99,13 +102,9 @@ class UnitTableViewController: UITableViewController {
         preferredContentSize = CGSize(width: 300, height: 300)
         if (self.items.count > 1)
         {
-            //print("if viewWillAppear and items contains : \(self.items)", terminator: "")
             performRefresh()
-            //print("if performRefresh() viewWillAppear and items contains : \(self.items)", terminator: "")
-            
             self.tableView.reloadData()
         } else {
-            //print("else viewWillAppear and items contains : \(self.items)", terminator: "")
         }
 
     }
@@ -116,12 +115,6 @@ class UnitTableViewController: UITableViewController {
         
         
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        
-    }
-
     
      override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Potentially incomplete method implementation.
@@ -156,8 +149,6 @@ class UnitTableViewController: UITableViewController {
         let selectedItem = items[indexPath]
         selectionHandler?(selectedItem: selectedItem)
         dismissViewControllerAnimated(true, completion: nil)
-        //self
-        print("didSelect \(self.items[indexPath.row])")
     }
 
 }

@@ -49,7 +49,7 @@ public class PopDatePicker : NSObject, UIPopoverPresentationControllerDelegate, 
         }
     }
     
-    public func adaptivePresentationStyleForPresentationController(PC: UIPresentationController!) -> UIModalPresentationStyle {
+    public func adaptivePresentationStyleForPresentationController(PC: UIPresentationController) -> UIModalPresentationStyle {
         
         return .None
     }

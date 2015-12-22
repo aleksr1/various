@@ -112,15 +112,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         popoverPresentationController?.barButtonItem = sender as UIBarButtonItem
         
         if unitLabel.text == "Unit"{
-            let alert = UIAlertController(title: "Error", message: "Please select a unit", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            self.buildAlert("NoUnit")
         } else {
             presentViewController(tableViewController, animated: true, completion: nil)
         }
-
-        
-        
     }
     
     @IBAction func newUnitButton(sender: UIBarButtonItem) {
@@ -194,26 +189,86 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                 case .Success(let data):
                     //print(data)
                     let swiftyJSONVar = JSON(data)
-                    if let resData = swiftyJSONVar["record"].arrayObject{
-                        self.membersData = resData as! [[String: String]]
-                    }
-                    //print("performRefresh \(self.argBlarg)")
-                case .Failure(_, let error):
-                    print("request failed with error: \(error)")
                     
-                    //DO Error Alert
+                    if response?.statusCode == 200 {
+                        if let resData = swiftyJSONVar["record"].arrayObject{
+                            self.membersData = resData as! [[String: String]]
+                        }
+                    } else {
+                        self.buildAlert("404")
+                    }
+                    
+                
+                case .Failure(_, _):
+                    self.buildAlert("Offline")
                 }
         }
         
         
     }
     
-    @IBAction func enterBtn(sender: AnyObject) {
-       
+    func buildAlert(alertype:String){
+        if alertype == "404" {
+            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
         
+        if alertype == "Offline" {
+            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        if alertype == "NoMember" {
+            let alertView = UIAlertController(title: "No Member", message: "Unable to find member", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+
+        if alertype == "NoUnit" {
+            let alertView = UIAlertController(title: "No Unit", message: "Please select the Unit", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+
+        }
+        
+        if alertype == "NoTime" {
+            let alertView = UIAlertController(title: "No Date or Time", message: "Please select the desired date and time", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+
+        }
+        
+        if alertype == "NoActivity" {
+            let alertView = UIAlertController(title: "No Activity", message: "Please select the Activity", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        if alertype == "NoStatus" {
+            let alertView = UIAlertController(title: "No Status", message: "Please select the In or Out", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+        
+        if alertype == "NoResult" {
+            let alertView = UIAlertController(title: "No Member", message: "Please enter a Member ID number", preferredStyle: .Alert)
+            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            self.presentViewController(alertView, animated: true, completion: nil)
+        }
+
+        
+    }
+
+    func enterFunc () {
+        var placeholder = 0
+        print("Enter Button Pressed")
         if(lblResult.text == "") {
             self.tableView.reloadData()
+            print("if lblResult.text == ''")
         } else {
+            print("else lblResult.text == ''")
             siteCode = "2000"
             personID = lblResult.text!
             unitName = unitLabel.text!
@@ -227,12 +282,14 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
             
         }
         let first = ["SiteCode": siteCode]
+        print("for statement called")
         for var i = 0; i < self.membersData.count; ++i{
             if personID == self.membersData[i]["MemberID"]{
-                
+                print("for if personID == self.membersData[i][MemberID]")
                 sendPunch(siteCode, memberID: personID, unitName: unitName, activityName: activityName, dateTime: dateTime, status: status)
                 
                 if self.punchMembers.count > 0 {
+                    print("if self.punchMembers.count > 0")
                     self.punchMembers.append(first)
                     let tempElement = self.punchMembers.count  - 1
                     self.punchMembers[tempElement]["MemberID"] = personID
@@ -246,9 +303,9 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                             self.punchMembers[tempElement]["LastName"] = self.membersData[i]["LastName"]
                         }
                     }
-
+                    
                 } else {
-                    print(first)
+                    print("else self.punchMembers.count > 0")
                     print(self.punchMembers)
                     self.punchMembers.append(first)
                     self.punchMembers[0]["MemberID"] = personID
@@ -262,35 +319,86 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                             self.punchMembers[0]["LastName"] = self.membersData[i]["LastName"]
                         }
                     }
-
+                    
                 }
-            } else {
-                print(personID)
-                print(self.membersData[i]["MemberID"])
             }
         }
-      
         self.tableView.reloadData()
+        
+        for var i = 0; i < self.punchMembers.count; ++i{
+            if personID == self.punchMembers[i]["MemberID"]{
+                placeholder = 1
+            }
+        }
+        
+        if placeholder == 0 {
+            self.buildAlert("NoMember")
+        }
 
+    }
+    
+    @IBAction func enterBtn(sender: AnyObject) {
+        if self.unitLabel.text != "" {
+            if self.activityLabel.text != "" {
+                if self.lblInOut.text != "" {
+                    if self.timeSwitch.on == false{
+                        if self.tfTimeDate.text != "" {
+                            if self.lblInOut.text != "" {
+                                if self.lblResult.text != "" {
+                                    self.enterFunc()
+                                } else {
+                                    self.buildAlert("NoResult")
+                                }
+                            } else {
+                                self.buildAlert("NoStatus")
+                            }
+                        } else {
+                            self.buildAlert("NoTime")
+                        }
+                    } else if self.timeSwitch.on == true{
+                        if self.lblInOut.text != ""{
+                            if self.lblResult.text != "" {
+                                self.enterFunc()
+                            } else {
+                                self.buildAlert("NoResult")
+                            }
+                        } else {
+                            self.buildAlert("NoStatus")
+                        }
+                    }
+                } else {
+                    self.buildAlert("NoStatus")
+                }
+            } else {
+                self.buildAlert("NoActivity")
+            }
+        } else {
+            self.buildAlert("NoUnit")
+        }
+        
+        
     }
     
     func sendPunch(siteCode: String, memberID: String, unitName:String, activityName:String, dateTime:String, status:String ){
         let record = [ "record" : [ "SiteCode" : siteCode, "MemberID" : memberID, "UnitName" : unitName, "ActivityName" : activityName, "DateTime" : dateTime, "Status" : status ] ]
         
-        let URL = NSURL(string: "http://192.5.31.22:92/rest/Test/Punch")!
-        let mutableURLRequest = NSMutableURLRequest(URL: URL)
-        mutableURLRequest.HTTPMethod = "POST"
-        mutableURLRequest.setValue("QEMobile", forHTTPHeaderField: "X-Dreamfactory-Application-Name")
+        print(record)
         let header = [
             "X-Dreamfactory-Application-Name" : "QEMobile"
         ]
 
         Alamofire.request(.POST, "http://192.5.31.22:92/rest/Test/Punch", parameters: record, headers: header)
-            .responseJSON { (request, response, data) in
-                print(request)
-                print("sendPunch \(response)")
-                print(data)
-                
+            .responseJSON { (request, response, result) in
+                switch result {
+                case .Success( _):
+                    if response?.statusCode == 200 {
+                        print(response)
+                    } else {
+                        self.buildAlert("404")
+                    }
+                case .Failure(_,_):
+                    self.buildAlert("Offline")
+                }
         }
     }
     
@@ -456,10 +564,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
             punchHistory += placeholder[row]["LastName"]!
             punchHistory += spaceColon
             punchHistory += placeholder[row]["Status"]!
-            print("/n/npunchhistory/n/n \(punchHistory)")
+            print("\n\npunchhistory\n\n \(punchHistory)")
             cell.lblOutput.text = punchHistory
         } else {
-            print("/n/n/n/npunch history not created")
+            print("\n\n\n\npunch history not created")
         }
         
         
@@ -538,31 +646,33 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject?) -> Bool {
         if identifier == "segueToBatch" {
-            if self.lblInOut.text! == "In/Out"{
-                let alert = UIAlertController(title: "Error", message: "Please choose In or Out", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-                self.presentViewController(alert, animated: true, completion: nil)
+            if self.lblInOut.text! == ""{
+                self.buildAlert("NoStatus")
                 
                 return false
-            }/* else if self.unitLabel.text == "Unit"{
-                let alert = UIAlertController(title: "Error", message: "Please select a Unit", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-                self.presentViewController(alert, animated: true, completion: nil)
+            } else if self.unitLabel.text == ""{
+                self.buildAlert("NoUnit")
                 return false
                 
-            } else if self.activityLabel.text == "Activity" {
-                let alert = UIAlertController(title: "Error", message: "Please select an Activity", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-                self.presentViewController(alert, animated: true, completion: nil)
+            } else if self.activityLabel.text == "" {
+                self.buildAlert("NoActivity")
                 
                 return false
-            }*/ else {
+            } else  if self.timeSwitch.on == false{
+                if self.tfTimeDate.text == "" {
+                    self.buildAlert("NoTime")
+                } else {
+                    return true
+                }
+            } else if self.timeSwitch.on == true{
                 return true
             }
             
             
         }
         return true
+        
+        
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -580,16 +690,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                 }
                 
             }
-            /*if self.lblInOut.text! == "In" {
-                if let destinationVC = segue.destinationViewController as? BatchViewController{
-                    destinationVC.attendMethod = self.lblInOut.text!
-                }
-            }
-            if self.lblInOut.text! == "Out" {
-                if let destinationVC = segue.destinationViewController as? BatchViewController{
-                    destinationVC.attendMethod = self.lblInOut.text!
-                }
-            }*/
+         
         }
     }
 }
