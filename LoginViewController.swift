@@ -6,10 +6,9 @@
 //  Copyright (c) 2015 VisionCPS. All rights reserved.
 //
 
-import SwiftyJSON
-import Alamofire
 import UIKit
-
+import Alamofire
+import SwiftyJSON
 
 class LoginViewController: UIViewController {
 
@@ -59,35 +58,6 @@ class LoginViewController: UIViewController {
        }
     
     @IBAction func loginBtn(sender: UIButton) {
-        /*sitecode = txtSiteCode.text!
-        username = txtUsername.text!
-        password = txtPassword.text!
-        
-        let header = [
-            "X-Dreamfactory-Application-Name" : "QEMobile"
-        ]
-        
-        Alamofire.request(.GET, "http://192.5.31.22:92/rest/Test/Logins?filter=sitecode%3D\(sitecode)AND%20username%3D'\(username)'%20AND%20password%3D'\(password)'", headers: header)                                                                                         //(mutableURLRequest)
-            .responseJSON { (request, response, result) in
-                let alertView = UIAlertController(title: "Error", message: "Login failed", preferredStyle: .Alert)
-                alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-                
-                switch result{
-                case .Success(let data):
-                    let json = JSON(data)
-                    if let siteCode : Int = json["record"][0]["SiteCode"].intValue {
-                        if siteCode == 0 {
-                            self.presentViewController(alertView, animated: true, completion: nil)
-                        } else {
-                            self.performSegueWithIdentifier("loggedInSegue", sender: self)
-                        }
-                    } else {
-                        self.presentViewController(alertView, animated: true, completion: nil)
-                        
-                    }case .Failure(_, _):
-                    self.presentViewController(alertView, animated: true, completion: nil)
-                }
-        }*/
         login()
     }
     
@@ -114,41 +84,19 @@ class LoginViewController: UIViewController {
                     if response?.statusCode == 200 {
                         if let siteCode : Int = json["record"][0]["SiteCode"].intValue {
                             if siteCode == 0 {
-                                self.buildAlert("FailedLoggin")
+                                Utils.showAlertOnVC(self, alertType: "FailedLoggin")
                             } else {
                                 self.performSegueWithIdentifier("loggedInSegue", sender: self)
                             }
                         } else {
-                            self.buildAlert("FailedLoggin")
-
+                            Utils.showAlertOnVC(self, alertType: "FailedLoggin")
+                        }
                     }
-                    
-                    }case .Failure(_, _):
-                       self.buildAlert("Offline")
+                case .Failure(_, _):
+                    Utils.showAlertOnVC(self, alertType: "Offline")
                 }
         }
-
     }
     
-    func buildAlert(alertype:String){
-        if alertype == "404" {
-            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
-        }
-        
-        if alertype == "FailedLoggin"{
-            let alertView = UIAlertController(title: "Error", message: "Login failed", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-        if alertype == "Offline" {
-            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-       
-    }
+    
 }

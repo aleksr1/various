@@ -7,7 +7,8 @@
 //
 
 import UIKit
-
+import Alamofire
+import SwiftyJSON
 class BatchTableViewCell: UITableViewCell {
     
     @IBOutlet var lblMemberID: UILabel!

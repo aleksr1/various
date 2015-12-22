@@ -6,10 +6,10 @@
 //  Copyright (c) 2015 VisionCPS. All rights reserved.
 //
 
+
 import UIKit
 import Alamofire
 import SwiftyJSON
-
 
 class ActivityTableViewController: UITableViewController {
     
@@ -52,31 +52,13 @@ class ActivityTableViewController: UITableViewController {
                         }
                         self.tableView.reloadData()
                     } else {
-                        self.buildAlert("404")
-                    
+                        Utils.showAlertOnVC(self, alertType: "404")
                     }
                 case .Failure(_, _):
-                    self.buildAlert("Offline")
+                    Utils.showAlertOnVC(self, alertType: "Offline")
                 }
         }
     }
-    
-    func buildAlert(alertype:String){
-        if alertype == "404" {
-            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
-        }
-        
-        if alertype == "Offline" {
-            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-        
-    }
-
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)

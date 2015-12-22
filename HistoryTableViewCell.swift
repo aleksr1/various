@@ -7,7 +7,8 @@
 //
 
 import UIKit
-
+import Alamofire
+import SwiftyJSON
 class HistoryTableViewCell: UITableViewCell {
     @IBOutlet var lblOutput: UILabel!
 

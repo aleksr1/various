@@ -9,7 +9,6 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
-
 class BatchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, UISearchBarDelegate {
     
     @IBOutlet var tableView: UITableView!
@@ -31,19 +30,8 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
         super.viewDidLoad()
         performRefresh()
         configureSearchController()
-        
-        /*if useCurrentTime == true {
-            self.dateTime = printTimestamp()
-        
-        }*/
-        print("attendMethod = \(attendMethod), unitName = \(unitName), activityName = \(activityName), dateTime = \(dateTime)")
     }
     
-    func printTimestamp() -> String {
-        let timestamp = NSDateFormatter.localizedStringFromDate(NSDate(), dateStyle: .MediumStyle, timeStyle: .ShortStyle)
-        print(timestamp)
-        return timestamp
-    }
     
     //10-21-15 SearchBar code updates
     func configureSearchController(){
@@ -117,14 +105,14 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
                         }
                         self.tableView.reloadData()
                     } else {
-                        self.buildAlert("404")
+                        Utils.showAlertOnVC(self, alertType: "404")
                     }
                     
                 case .Failure(_, _):
-                    self.buildAlert("Offline")
+                    Utils.showAlertOnVC(self, alertType: "Offline")
                 }
         }
-        print("performRefresh \(self.unfilteredMembers)")
+        //print("performRefresh \(self.unfilteredMembers)")
     }
     
     func sendPunch(siteCode: String, memberID: String, unitName:String, activityName:String, dateTime:String, status:String ){
@@ -141,30 +129,17 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
                     if response?.statusCode == 200 {
                         
                     } else {
-                        self.buildAlert("404")
+                        Utils.showAlertOnVC(self, alertType: "404")
                     }
-                case .Failure(_,_):
-                    self.buildAlert("Offline")
+                    
+                case .Failure(_, _):
+                    Utils.showAlertOnVC(self, alertType: "Offline")
                 }
         }
 
     }
     
-    func buildAlert(alertype:String){
-        if alertype == "404" {
-            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
-        }
-        
-        if alertype == "Offline" {
-            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-        
-    }
+    
 
     
     func performAccept(){
@@ -401,7 +376,7 @@ class BatchViewController: UIViewController, UITableViewDataSource, UITableViewD
     @IBAction func pressAccept(sender: AnyObject) {
         
         if useCurrentTime == true {
-            dateTime = printTimestamp()
+            dateTime = Utils.printTimestamp()
             print(dateTime) 
         }
         if self.punchMembers.count > 0 {

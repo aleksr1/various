@@ -46,30 +46,24 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     var dateTime = ""
     var status = ""
     var siteCode = ""
-    //var child:Child!
-    var childIn : [String] = []
-    var childIn2 : [String] = []
     let textCellIdentifier = "TextCell"
     var punchMembers = [Dictionary<String,String>]()
     var punchBatchMembers = [Dictionary<String, String>]()
     var membersData = [Dictionary<String, String>]()
+    
+    
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
-        
+        print(Utils.printTimestamp())
         popDatePicker = PopDatePicker(forTextField: tfTimeDate)
         performRefresh()
         tfTimeDate.delegate = self
-        printTimestamp()
     }
     
-    func printTimestamp() -> String {
-        let timestamp = NSDateFormatter.localizedStringFromDate(NSDate(), dateStyle: .MediumStyle, timeStyle: .ShortStyle)
-        return timestamp
-    }
     
     
     override func didReceiveMemoryWarning() {
@@ -112,7 +106,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         popoverPresentationController?.barButtonItem = sender as UIBarButtonItem
         
         if unitLabel.text == "Unit"{
-            self.buildAlert("NoUnit")
+            Utils.showAlertOnVC(self, alertType: "NoUnit")
         } else {
             presentViewController(tableViewController, animated: true, completion: nil)
         }
@@ -195,72 +189,14 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                             self.membersData = resData as! [[String: String]]
                         }
                     } else {
-                        self.buildAlert("404")
+                        Utils.showAlertOnVC(self, alertType: "404")
                     }
-                    
-                
                 case .Failure(_, _):
-                    self.buildAlert("Offline")
+                    Utils.showAlertOnVC(self, alertType: "Offline")
                 }
         }
-        
-        
     }
     
-    func buildAlert(alertype:String){
-        if alertype == "404" {
-            let alert = UIAlertController(title: "Site Not Found", message: "Server is unavailable at this time", preferredStyle: .Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
-        }
-        
-        if alertype == "Offline" {
-            let alertView = UIAlertController(title: "Offline", message: "Your devices appears to be offline", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-        if alertype == "NoMember" {
-            let alertView = UIAlertController(title: "No Member", message: "Unable to find member", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-
-        if alertype == "NoUnit" {
-            let alertView = UIAlertController(title: "No Unit", message: "Please select the Unit", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-
-        }
-        
-        if alertype == "NoTime" {
-            let alertView = UIAlertController(title: "No Date or Time", message: "Please select the desired date and time", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-
-        }
-        
-        if alertype == "NoActivity" {
-            let alertView = UIAlertController(title: "No Activity", message: "Please select the Activity", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-        if alertype == "NoStatus" {
-            let alertView = UIAlertController(title: "No Status", message: "Please select the In or Out", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-        
-        if alertype == "NoResult" {
-            let alertView = UIAlertController(title: "No Member", message: "Please enter a Member ID number", preferredStyle: .Alert)
-            alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(alertView, animated: true, completion: nil)
-        }
-
-        
-    }
-
     func enterFunc () {
         var placeholder = 0
         print("Enter Button Pressed")
@@ -273,7 +209,13 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
             personID = lblResult.text!
             unitName = unitLabel.text!
             activityName = activityLabel.text!
-            dateTime = tfTimeDate.text!
+            if timeSwitch.on == true {
+                dateTime = Utils.printTimestamp()
+            }
+            
+            if timeSwitch.on == false {
+                dateTime = tfTimeDate.text!
+            }
             status = lblInOut.text!
             lblResult.text = ""
             let stringOne = String(format: "%@ -- %@ -- %@ --  %@", personID, unitName, activityName, dateTime, status)
@@ -332,48 +274,48 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         }
         
         if placeholder == 0 {
-            self.buildAlert("NoMember")
+            Utils.showAlertOnVC(self, alertType: "NoMember")
         }
 
     }
     
     @IBAction func enterBtn(sender: AnyObject) {
-        if self.unitLabel.text != "" {
-            if self.activityLabel.text != "" {
-                if self.lblInOut.text != "" {
-                    if self.timeSwitch.on == false{
-                        if self.tfTimeDate.text != "" {
-                            if self.lblInOut.text != "" {
-                                if self.lblResult.text != "" {
-                                    self.enterFunc()
+        if unitLabel.text != "" {
+            if activityLabel.text != "" {
+                if lblInOut.text != "" {
+                    if timeSwitch.on == false{
+                        if tfTimeDate.text != "" {
+                            if lblInOut.text != "" {
+                                if lblResult.text != "" {
+                                    enterFunc()
                                 } else {
-                                    self.buildAlert("NoResult")
+                                    Utils.showAlertOnVC(self, alertType: "NoMember")
                                 }
                             } else {
-                                self.buildAlert("NoStatus")
+                                Utils.showAlertOnVC(self, alertType: "NoStatus")
                             }
                         } else {
-                            self.buildAlert("NoTime")
+                            Utils.showAlertOnVC(self, alertType: "NoTime")
                         }
-                    } else if self.timeSwitch.on == true{
-                        if self.lblInOut.text != ""{
-                            if self.lblResult.text != "" {
-                                self.enterFunc()
+                    } else if timeSwitch.on == true{
+                        if lblInOut.text != ""{
+                            if lblResult.text != "" {
+                                enterFunc()
                             } else {
-                                self.buildAlert("NoResult")
+                                Utils.showAlertOnVC(self, alertType: "NoMember")
                             }
                         } else {
-                            self.buildAlert("NoStatus")
+                            Utils.showAlertOnVC(self, alertType: "NoStatus")
                         }
                     }
                 } else {
-                    self.buildAlert("NoStatus")
+                    Utils.showAlertOnVC(self, alertType: "NoStatus")
                 }
             } else {
-                self.buildAlert("NoActivity")
+                Utils.showAlertOnVC(self, alertType: "NoActivity")
             }
         } else {
-            self.buildAlert("NoUnit")
+            Utils.showAlertOnVC(self, alertType: "NoUnit")
         }
         
         
@@ -394,10 +336,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                     if response?.statusCode == 200 {
                         print(response)
                     } else {
-                        self.buildAlert("404")
+                        Utils.showAlertOnVC(self, alertType: "404")
                     }
                 case .Failure(_,_):
-                    self.buildAlert("Offline")
+                    Utils.showAlertOnVC(self, alertType: "Offline")
                 }
         }
     }
@@ -646,25 +588,22 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject?) -> Bool {
         if identifier == "segueToBatch" {
-            if self.lblInOut.text! == ""{
-                self.buildAlert("NoStatus")
-                
+            if unitLabel.text! == ""{
+                Utils.showAlertOnVC(self, alertType: "NoUnit")
                 return false
-            } else if self.unitLabel.text == ""{
-                self.buildAlert("NoUnit")
+            } else if activityLabel.text == ""{
+                Utils.showAlertOnVC(self, alertType: "NoActivity")
                 return false
-                
-            } else if self.activityLabel.text == "" {
-                self.buildAlert("NoActivity")
-                
+            } else if lblInOut.text == "" {
+                Utils.showAlertOnVC(self, alertType: "NoStatus")
                 return false
-            } else  if self.timeSwitch.on == false{
-                if self.tfTimeDate.text == "" {
-                    self.buildAlert("NoTime")
+            } else  if timeSwitch.on == false{
+                if tfTimeDate.text == "" {
+                    Utils.showAlertOnVC(self, alertType: "NoTime")
                 } else {
                     return true
                 }
-            } else if self.timeSwitch.on == true{
+            } else if timeSwitch.on == true{
                 return true
             }
             

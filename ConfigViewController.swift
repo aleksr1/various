@@ -7,7 +7,8 @@
 //
 
 import UIKit
-
+import Alamofire
+import SwiftyJSON
 
 
 class ConfigViewController: UIViewController {
@@ -27,14 +28,14 @@ class ConfigViewController: UIViewController {
     
    @IBAction func btnAccept(sender: AnyObject) {
         didCancel = "no"
-        let alertView = UIAlertController(title: "Error", message: "Prefix cannot exceed two characters.", preferredStyle: .Alert)
-        alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
         if txtPrefixOne.text!.characters.count > 2 || txtPrefixTwo.text!.characters.count > 2 || txtPrefixThree.text!.characters.count > 2 || txtPrefixFour.text!.characters.count > 2 {
-             presentViewController(alertView, animated: true, completion: nil)
+            Utils.showAlertOnVC(self, alertType: "ExcessPrefix")
         } else {
             self.performSegueWithIdentifier("UnwindConfig", sender: self)
         }
     }
+    
+    
    
     @IBAction func textFieldDoneEditing(sender: UITextField) {
         sender.resignFirstResponder()
