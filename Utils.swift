@@ -85,8 +85,4 @@ class Utils
         return timestamp
     }
     
-    class func buildDropdown(targetTBLView: UITableViewController)
-    {
-        
-    }
 }
