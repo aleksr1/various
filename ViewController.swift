@@ -50,6 +50,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     var punchMembers = [Dictionary<String,String>]()
     var punchBatchMembers = [Dictionary<String, String>]()
     var membersData = [Dictionary<String, String>]()
+    var dup = false
     
     
     
@@ -109,10 +110,13 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
             Utils.showAlertOnVC(self, alertType: "NoUnit")
         } else {
             presentViewController(tableViewController, animated: true, completion: nil)
+           
         }
     }
     
     @IBAction func newUnitButton(sender: UIBarButtonItem) {
+        
+        
         let tableViewController = UnitTableViewController()
         tableViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
         tableViewController.selectionHandler = self.unitSelectionHandler
@@ -128,6 +132,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         
     }
    
+    
     
     func unitSelectionHandler(selectedItem: String){
         self.selectedItem = selectedItem
@@ -220,7 +225,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
             lblResult.text = ""
             let stringOne = String(format: "%@ -- %@ -- %@ --  %@", personID, unitName, activityName, dateTime, status)
             print(stringOne)
-            //childIn.append(personID)
+            
             
         }
         let first = ["SiteCode": siteCode]
@@ -280,6 +285,13 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     }
     
     @IBAction func enterBtn(sender: AnyObject) {
+        for var i = 0; i < punchMembers.count; ++i{
+            if lblResult.text == punchMembers[i]["MemberID"] {
+                dup = true
+            }
+        }
+        print(dup)
+        
         if unitLabel.text != "" {
             if activityLabel.text != "" {
                 if lblInOut.text != "" {
@@ -287,7 +299,15 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                         if tfTimeDate.text != "" {
                             if lblInOut.text != "" {
                                 if lblResult.text != "" {
-                                    enterFunc()
+                                    if dup == false {
+                                        enterFunc()
+                                        
+                                    } else {
+                                        Utils.showAlertOnVC(self, alertType: "Duplicate")
+                                        dup = false
+                                        lblResult.text = ""
+                                    }
+                                    
                                 } else {
                                     Utils.showAlertOnVC(self, alertType: "NoMember")
                                 }
@@ -300,7 +320,14 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                     } else if timeSwitch.on == true{
                         if lblInOut.text != ""{
                             if lblResult.text != "" {
-                                enterFunc()
+                                if dup == false {
+                                    enterFunc()
+                                    
+                                } else {
+                                    Utils.showAlertOnVC(self, alertType: "Duplicate")
+                                    dup = false
+                                    lblResult.text = ""
+                                }
                             } else {
                                 Utils.showAlertOnVC(self, alertType: "NoMember")
                             }

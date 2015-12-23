@@ -54,6 +54,10 @@ class Utils
         if alertType == "FailedLoggin"{
             buildAlert(targetVC, title: "Login Failed", message: "Login information is incorrect")
         }
+        
+        if alertType == "Duplicate" {
+            buildAlert(targetVC, title: "Duplicate Entry", message: "This member has already been entered")
+        }
 
 
     }
@@ -79,5 +83,10 @@ class Utils
     class func printTimestamp() -> String {
         let timestamp = NSDateFormatter.localizedStringFromDate(NSDate(), dateStyle: .MediumStyle, timeStyle: .ShortStyle)
         return timestamp
+    }
+    
+    class func buildDropdown(targetTBLView: UITableViewController)
+    {
+        
     }
 }
