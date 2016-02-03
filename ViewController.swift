@@ -51,7 +51,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     var punchBatchMembers = [Dictionary<String, String>]()
     var membersData = [Dictionary<String, String>]()
     var dup = false
-    
+    var session = ""
     
     
 
@@ -63,6 +63,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         popDatePicker = PopDatePicker(forTextField: tfTimeDate)
         performRefresh()
         tfTimeDate.delegate = self
+        print("session = \(session)")
     }
     
     
@@ -198,6 +199,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
                     }
                 case .Failure(_, _):
                     Utils.showAlertOnVC(self, alertType: "Offline")
+                    print("this is the culprit")
                 }
         }
     }

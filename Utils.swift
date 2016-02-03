@@ -85,4 +85,57 @@ class Utils
         return timestamp
     }
     
+    class func encryption(passed: String, userID: Int) -> String
+    {
+        var loopIt:Int?
+        loopIt = 1
+        
+        var encryptedPassword = ""
+        var s = passed.lowercaseString
+        
+        if s.characters.count < 20 {
+            let padding = 20 - s.characters.count
+            for _ in 1 ... padding {
+                s.insert(" ", atIndex: s.endIndex)
+            }
+        }
+        
+        for codeUnit in s.utf8 {
+            let placeHolder = Int(codeUnit) * 2 - loopIt! - userID%11
+            ++loopIt!
+            let u = UnicodeScalar(placeHolder)
+            encryptedPassword.append(u)
+            if encryptedPassword.characters.count == 20 {
+                break
+            }
+        }
+        
+        return encryptedPassword
+    }
+    
+    class func decryption(passed: String, userID: Int) -> String
+    {
+        var loopIt:Int?
+        loopIt = 1
+        var decryptedPassword = ""
+        let s = passed
+        
+        for var i = 0; i < s.characters.count; ++i
+        {
+            let a = [Character](s.characters)
+            if i < a.count {
+                let b = a[i]
+                let d = String(b).unicodeScalars
+                let e = d[d.startIndex].value
+                var placeHolder = Int(e) + userID%11 + loopIt!
+                placeHolder = placeHolder / 2
+                ++loopIt!
+                let f = UnicodeScalar(placeHolder)
+                decryptedPassword.append(f)
+            }
+        }
+        
+        return decryptedPassword
+    }
+
 }
