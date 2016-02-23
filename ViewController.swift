@@ -52,6 +52,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
     var membersData = [Dictionary<String, String>]()
     var dup = false
     var session = ""
+    var clientCode = ""
     
     
 
@@ -64,6 +65,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         performRefresh()
         tfTimeDate.delegate = self
         print("session = \(session)")
+        print("ClientCode = \(clientCode)")
     }
     
     
@@ -373,6 +375,9 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         }
     }
     
+    @IBAction func logout(sender: AnyObject) {
+        self.performSegueWithIdentifier("UnwindLogin", sender: self)
+    }
     
     @IBAction func btnNumber(sender: UIButton) {
         let num = sender.currentTitle
@@ -550,6 +555,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UITableViewDataSour
         return cell
     }
     
+   
 
     
     /*func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
